@@ -58,7 +58,6 @@ const loadData = async (userId: string, chatId: string, files: File[]) => {
           userId: userId,
           chatId: chatId
         };
-        console.log("making page", id_)
         return new Document({ text, id_, metadata });
       });
       documents.push(...docs)
@@ -80,15 +79,14 @@ const updateIndex = async (userId: string, chatId: string, files: File[]) => {
 
     // create vector store
     const vectorStore = new PineconeVectorStore();
-    console.log("vectorStore created - ", vectorStore)
+    console.log("vectorStore created.")
     // create index from all the Documents and store them in Pinecone
     console.log("Creating embeddings...");
     const storageContext = await storageContextFromDefaults({ vectorStore });
-    console.log("storageContextFromDefaults done - ", storageContext)
     await VectorStoreIndex.fromDocuments(documents, { storageContext });
     console.log("Embeddings created and stored in Pinecone successfully.",);
   } catch (error: any) {
-    console.log("error in updateIndex: ", error)
+    console.log("error updating index: ", error)
     throw new Error(error)
   }
 }
@@ -142,20 +140,13 @@ export async function POST(request: Request) {
     // 3. update index (inject userid and chatid in metadata)
     await updateIndex(userId, chatId, files)
 
-    console.log("update index took", performance.now() - start, "ms")
-
-    start = performance.now()
-
     // 4. upload files to supabase
     await uploadFiles(userId, chatId, files)
-
-    console.log("uploadFiles took", performance.now() - start, "ms")
 
     // 5. return the generated chatId
     return NextResponse.json({ chatId: chatId }, { status: 200 })
     
   } catch (error) {
-    // console.log(error)
     if (error instanceof AuthError)
       return NextResponse.json({ response: "Unauthorized user" }, { status: 401 })
     else

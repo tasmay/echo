@@ -2,8 +2,7 @@
 import { createClient } from '@/utils/supabase/server';
 
 export const listFiles = async (userId: string, chatId: string) => {
-  console.log("userId = ", userId)
-  console.log("chatId = ", chatId)
+  console.log("userId = ", userId, " | chatId = ", chatId)
   const supabase = createClient();
   const { data, error } = await supabase
     .storage
@@ -12,9 +11,10 @@ export const listFiles = async (userId: string, chatId: string) => {
       sortBy: { column: 'name', order: 'asc' },
   })
   console.log("list files data: ", data)
-  console.log("list files error: ", error)
-  if (error)
+  if (error) {
+    console.log("list files error: ", error)
     throw new Error(error.message)
+  }
   return data;
 }
 

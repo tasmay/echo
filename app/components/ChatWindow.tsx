@@ -37,7 +37,6 @@ export default function ChatWindow({ chatId }: ChatWindowProps) {
             body: JSON.stringify({query: newMsg.text})
           });
         const result = await res.json()
-        console.log(result.response)
         setIsTyping(false)
         let response = {id: `i-${Math.random()}`, text: result.response, role: 'echo'}
         setMessageList(prev => ([
